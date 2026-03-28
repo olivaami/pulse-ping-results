@@ -16,9 +16,6 @@
     --green: #16a34a;
     --red: #dc2626;
     --tag-bg: #f0f0ec;
-    --manual-bg: #fefce8;
-    --manual-border: #fde047;
-    --manual-text: #854d0e;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -36,8 +33,6 @@
   .notif-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: #6b7280; color: white; border: none; border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.2s; }
   .notif-btn:hover { opacity: 0.85; }
   .notif-btn.active { background: var(--green); }
-  .add-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: #d97706; color: white; border: none; border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
-  .add-btn:hover { opacity: 0.85; }
   .last-updated { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
 
   /* MAIN */
@@ -72,8 +67,6 @@
   tr:last-child td { border-bottom: none; }
   tr.data-row { cursor: pointer; transition: background 0.1s; }
   tr.data-row:hover td { background: #f0f4ff; }
-  tr.manual-row td { background: var(--manual-bg); }
-  tr.manual-row:hover td { background: #fef9c3; }
   .td-mono { font-family: 'DM Mono', monospace; font-size: 13px; }
   .td-bpm { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; }
   .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
@@ -83,10 +76,7 @@
   .status-badge.unknown { background: var(--tag-bg); color: var(--muted); }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .device-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; background: var(--tag-bg); font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); font-weight: 500; }
-  .manual-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; background: #fde68a; font-family: 'DM Mono', monospace; font-size: 10px; color: #92400e; font-weight: 600; letter-spacing: 0.3px; margin-left: 4px; }
   .view-hint { font-size: 11px; color: var(--accent); font-weight: 500; }
-  .delete-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 15px; padding: 4px 8px; border-radius: 6px; transition: all 0.15s; line-height: 1; }
-  .delete-btn:hover { background: #fee2e2; color: var(--red); }
 
   /* EMPTY / LOADING */
   .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
@@ -97,187 +87,52 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ECG MODAL */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(4px);
-    z-index: 100;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.2s;
-  }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
-  .modal {
-    background: var(--surface);
-    border-radius: 16px;
-    width: 90%;
-    max-width: 780px;
-    overflow: hidden;
-    transform: translateY(16px) scale(0.98);
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.18);
-  }
+  .modal { background: var(--surface); border-radius: 16px; width: 90%; max-width: 780px; overflow: hidden; transform: translateY(16px) scale(0.98); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 24px 60px rgba(0,0,0,0.18); }
   .modal-overlay.open .modal { transform: translateY(0) scale(1); }
-  .modal-header {
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: flex-start; justify-content: space-between;
-  }
+  .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; }
   .modal-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 4px; }
   .modal-meta { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
-  .modal-close {
-    width: 30px; height: 30px;
-    border: 1px solid var(--border); border-radius: 8px;
-    background: var(--tag-bg); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; color: var(--muted);
-    transition: all 0.15s; flex-shrink: 0;
-  }
+  .modal-close { width: 30px; height: 30px; border: 1px solid var(--border); border-radius: 8px; background: var(--tag-bg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--muted); transition: all 0.15s; flex-shrink: 0; }
   .modal-close:hover { background: var(--border); color: var(--text); }
-  .modal-stats {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 0; border-bottom: 1px solid var(--border);
-  }
+  .modal-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-bottom: 1px solid var(--border); }
   .modal-stat { padding: 16px 24px; border-right: 1px solid var(--border); }
   .modal-stat:last-child { border-right: none; }
   .modal-stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 4px; }
   .modal-stat-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; }
   .ecg-strip-wrap { padding: 20px 24px 24px; background: #f9fdf9; }
   .ecg-strip-label { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .ecg-canvas-wrap { background: #fff8f0; border-radius: 8px; border: 1px solid #e8ddd0; overflow: hidden; position: relative; }
+  .ecg-canvas-wrap { background: #fff8f0; border-radius: 8px; border: 1px solid #e8ddd0; overflow: hidden; }
   canvas#ecgCanvas { display: block; width: 100%; height: 180px; }
   .ecg-speed-note { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 8px; text-align: right; }
-
-  /* ADD ENTRY MODAL */
-  .add-modal-inner { max-width: 520px !important; max-height: 90vh; overflow-y: auto; }
-  .add-modal-body { padding: 24px; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-group.full { grid-column: 1 / -1; }
-  .form-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'DM Mono', monospace; }
-  .form-input, .form-select {
-    padding: 9px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    background: var(--surface);
-    transition: border-color 0.15s;
-    outline: none;
-    width: 100%;
-  }
-  .form-input:focus, .form-select:focus { border-color: var(--accent); }
-  .form-input::placeholder { color: #c0c0ba; }
-  .form-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .form-actions { display: flex; gap: 10px; }
-  .form-submit-btn {
-    flex: 1; padding: 11px;
-    background: var(--text); color: white;
-    border: none; border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: opacity 0.15s;
-  }
-  .form-submit-btn:hover { opacity: 0.85; }
-  .form-cancel-btn {
-    padding: 11px 20px;
-    background: none; color: var(--muted);
-    border: 1px solid var(--border); border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px;
-    cursor: pointer; transition: background 0.15s;
-  }
-  .form-cancel-btn:hover { background: var(--tag-bg); }
-  .add-modal-banner {
-    background: #fffbeb;
-    border-bottom: 1px solid #fde68a;
-    padding: 10px 24px;
-    font-size: 12px;
-    color: #92400e;
-    display: flex; align-items: center; gap: 8px;
-  }
 
   /* NOTIFICATION MODAL */
   .notif-modal-inner { max-width: 440px !important; }
   .notif-modal-body { padding: 24px; }
   .notif-modal-desc { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
   .proto-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-  .proto-choice-btn {
-    width: 100%; padding: 14px 18px;
-    border: 1.5px solid var(--border); border-radius: 10px;
-    background: var(--tag-bg); cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
-    transition: all 0.15s; text-align: left;
-    display: flex; align-items: center; justify-content: space-between;
-    color: var(--text);
-  }
+  .proto-choice-btn { width: 100%; padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--tag-bg); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; transition: all 0.15s; text-align: left; display: flex; align-items: center; justify-content: space-between; color: var(--text); }
   .proto-choice-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
   .proto-choice-btn:hover .proto-arrow { opacity: 1; }
   .proto-badge { font-family: 'DM Mono', monospace; font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(0,0,0,0.07); }
   .proto-choice-btn:hover .proto-badge { background: rgba(255,255,255,0.2); }
   .proto-arrow { opacity: 0; font-size: 16px; transition: opacity 0.15s; }
-  .notif-cancel-btn {
-    width: 100%; padding: 10px;
-    border: 1px solid var(--border); border-radius: 8px;
-    background: none; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted);
-    transition: background 0.15s;
-  }
+  .notif-cancel-btn { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); transition: background 0.15s; }
   .notif-cancel-btn:hover { background: var(--tag-bg); }
-
-  /* NOTIF ACTIVE INDICATOR */
-  .notif-active-dot {
-    display: inline-block; width: 8px; height: 8px;
-    border-radius: 50%; background: #4ade80;
-    animation: pulse-dot 2s ease-in-out infinite;
-    flex-shrink: 0;
-  }
-  @keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(0.85); }
-  }
+  .notif-active-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #4ade80; animation: pulse-dot 2s ease-in-out infinite; flex-shrink: 0; }
+  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.85)} }
 
   /* TOAST */
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-    background: #1a1a1a; color: white;
-    padding: 12px 20px; border-radius: 10px;
-    font-size: 13px; font-weight: 500;
-    z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    white-space: nowrap; pointer-events: none;
-    display: flex; align-items: center; gap: 8px;
-  }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a1a; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; pointer-events: none; }
   .toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* CONFIRM DELETE MODAL */
-  .confirm-modal-inner { max-width: 380px !important; }
-  .confirm-modal-body { padding: 24px; }
-  .confirm-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-  .confirm-desc { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
-  .confirm-actions { display: flex; gap: 10px; }
-  .confirm-delete-btn {
-    flex: 1; padding: 10px;
-    background: var(--red); color: white;
-    border: none; border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: opacity 0.15s;
-  }
-  .confirm-delete-btn:hover { opacity: 0.85; }
-  .confirm-cancel-btn {
-    flex: 1; padding: 10px;
-    background: none; color: var(--muted);
-    border: 1px solid var(--border); border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px;
-    cursor: pointer; transition: background 0.15s;
-  }
-  .confirm-cancel-btn:hover { background: var(--tag-bg); }
 
   @media (max-width: 700px) {
     .stats-row { grid-template-columns: repeat(2, 1fr); }
-    header { padding: 0 16px; height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+    header { padding: 12px 16px; height: auto; flex-wrap: wrap; gap: 8px; }
     main { padding: 24px 16px; }
     .modal-stats { grid-template-columns: 1fr 1fr; }
     .last-updated { display: none; }
-    .form-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -297,12 +152,7 @@
   </div>
   <div class="header-right">
     <span class="last-updated" id="lastUpdated">—</span>
-    <button class="notif-btn" id="notifBtn" onclick="openNotifModal()">
-      🔔 Set Alert
-    </button>
-    <button class="add-btn" onclick="openAddModal()">
-      + Add Result
-    </button>
+    <button class="notif-btn" id="notifBtn" onclick="openNotifModal()">🔔 Set Alert</button>
     <button class="refresh-btn" id="refreshBtn" onclick="loadData()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
@@ -364,7 +214,7 @@
           <div class="empty-state">
             <div class="empty-icon">📡</div>
             <div class="empty-text">Loading data...</div>
-            <div class="empty-sub">Fetching from ThingSpeak</div>
+            <div class="empty-sub">Fetching from ThingSpeak &amp; Firebase</div>
           </div>
         </td></tr>
       </tbody>
@@ -373,8 +223,8 @@
 </main>
 
 <!-- ECG STRIP MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
-  <div class="modal" id="modal">
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
     <div class="modal-header">
       <div>
         <div class="modal-title" id="modalTitle">ECG Strip</div>
@@ -406,88 +256,9 @@
   </div>
 </div>
 
-<!-- ADD ENTRY MODAL -->
-<div class="modal-overlay" id="addOverlay" onclick="handleAddOverlayClick(event)">
-  <div class="modal add-modal-inner" id="addModal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">Add Manual Result</div>
-        <div class="modal-meta">Entry will be marked as manually added</div>
-      </div>
-      <button class="modal-close" onclick="closeAddModal()">✕</button>
-    </div>
-    <div class="add-modal-banner">
-      ✏️ Manual entries are stored locally in this browser and shown with a yellow tag.
-    </div>
-    <div class="add-modal-body">
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">BPM *</label>
-          <input class="form-input" type="number" id="formBPM" placeholder="e.g. 78" min="20" max="250">
-        </div>
-        <div class="form-group">
-          <label class="form-label">QRS (ms) *</label>
-          <input class="form-input" type="number" id="formQRS" placeholder="e.g. 100" min="40" max="300">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Status *</label>
-          <select class="form-select" id="formStatus">
-            <option value="">— Select —</option>
-            <option value="2">Sinus Rhythm (Normal)</option>
-            <option value="1">Sinus Bradycardia (&lt;60 bpm)</option>
-            <option value="3">Sinus Tachycardia (&gt;100 bpm)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Device / Prototype *</label>
-          <select class="form-select" id="formDevice">
-            <option value="1">Prototype 1</option>
-            <option value="2">Prototype 2</option>
-            <option value="3">Prototype 3</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Batch / Respondent</label>
-          <input class="form-input" type="text" id="formBatch" placeholder="e.g. Batch 1, R-03">
-          <span class="form-hint">Optional label for tracking</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Date & Time *</label>
-          <input class="form-input" type="datetime-local" id="formTimestamp">
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="form-cancel-btn" onclick="closeAddModal()">Cancel</button>
-        <button class="form-submit-btn" onclick="submitManualEntry()">Save Result</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- CONFIRM DELETE MODAL -->
-<div class="modal-overlay" id="confirmOverlay" onclick="handleConfirmOverlayClick(event)">
-  <div class="modal confirm-modal-inner">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">Delete Entry</div>
-        <div class="modal-meta">This action cannot be undone</div>
-      </div>
-      <button class="modal-close" onclick="closeConfirmModal()">✕</button>
-    </div>
-    <div class="confirm-modal-body">
-      <div class="confirm-title">Remove this manual entry?</div>
-      <div class="confirm-desc" id="confirmDesc">This result will be permanently removed from your local data.</div>
-      <div class="confirm-actions">
-        <button class="confirm-cancel-btn" onclick="closeConfirmModal()">Keep it</button>
-        <button class="confirm-delete-btn" onclick="confirmDelete()">Delete</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- NOTIFICATION SETUP MODAL -->
-<div class="modal-overlay" id="notifOverlay" onclick="handleNotifOverlayClick(event)">
-  <div class="modal notif-modal-inner" id="notifModal">
+<!-- NOTIFICATION MODAL -->
+<div class="modal-overlay" id="notifOverlay">
+  <div class="modal notif-modal-inner">
     <div class="modal-header">
       <div>
         <div class="modal-title" id="notifModalTitle">🔔 ECG Alert Setup</div>
@@ -501,37 +272,39 @@
         Sinus Bradycardia (&lt;60 bpm) or Sinus Tachycardia (&gt;100 bpm).
       </p>
       <div class="proto-grid" id="protoGrid">
-        <button class="proto-choice-btn" onclick="confirmNotif(1)">
-          <span>Prototype 1</span>
-          <span style="display:flex;align-items:center;gap:8px"><span class="proto-badge">P1</span><span class="proto-arrow">→</span></span>
-        </button>
-        <button class="proto-choice-btn" onclick="confirmNotif(2)">
-          <span>Prototype 2</span>
-          <span style="display:flex;align-items:center;gap:8px"><span class="proto-badge">P2</span><span class="proto-arrow">→</span></span>
-        </button>
-        <button class="proto-choice-btn" onclick="confirmNotif(3)">
-          <span>Prototype 3</span>
-          <span style="display:flex;align-items:center;gap:8px"><span class="proto-badge">P3</span><span class="proto-arrow">→</span></span>
-        </button>
+        <button class="proto-choice-btn" onclick="confirmNotif(1)"><span>Prototype 1</span><span style="display:flex;align-items:center;gap:8px"><span class="proto-badge">P1</span><span class="proto-arrow">→</span></span></button>
+        <button class="proto-choice-btn" onclick="confirmNotif(2)"><span>Prototype 2</span><span style="display:flex;align-items:center;gap:8px"><span class="proto-badge">P2</span><span class="proto-arrow">→</span></span></button>
+        <button class="proto-choice-btn" onclick="confirmNotif(3)"><span>Prototype 3</span><span style="display:flex;align-items:center;gap:8px"><span class="proto-badge">P3</span><span class="proto-arrow">→</span></span></button>
       </div>
       <button class="notif-cancel-btn" id="notifActionBtn" onclick="closeNotifModal()">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+// ============================================================
+// 🔧 PASTE THE SAME FIREBASE CONFIG AS IN ecg-admin.html
+// ============================================================
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDhawfWUerW8-wiMZKMlU8rs3mSisJiS5E",
+  authDomain: "ecg-result.firebaseapp.com",
+  projectId: "ecg-result",
+  storageBucket: "ecg-result.firebasestorage.app",
+  messagingSenderId: "293139984564",
+  appId: "1:293139984564:web:fed1018858fb9b2938e7e1",
+  measurementId: "G-EBPVJ45693"
+};
+// ============================================================
+
 const CHANNEL_ID  = '3290555';
 const READ_KEY    = 'TE24GTY3DXKWKAAZ';
 const MAX_RESULTS = 100;
-const STORAGE_KEY = 'ecg_manual_entries';
-
-let allFeeds = [];       // from ThingSpeak
-let manualEntries = [];  // from localStorage
-let activeFilter = 'all';
-let pendingDeleteId = null;
+const COLLECTION  = 'ecg_entries';
 
 const STATUS_MAP = {
   '1': { label: 'Sinus Bradycardia', cls: 'brady' },
@@ -539,124 +312,336 @@ const STATUS_MAP = {
   '3': { label: 'Sinus Tachycardia', cls: 'tachy' },
 };
 
+let tsFeeds      = [];
+let manualEntries = [];
+let activeFilter = 'all';
+let openRow      = null;
+let notifCooldown = false;
+let watchedProto = null;
+
 // =====================
-// MANUAL ENTRY STORAGE
+// FIREBASE
 // =====================
-function loadManualEntries() {
+function initFirebase() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    manualEntries = raw ? JSON.parse(raw) : [];
+    if (FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY') return;
+    const app = initializeApp(FIREBASE_CONFIG);
+    const db  = getFirestore(app);
+    onSnapshot(collection(db, COLLECTION), (snap) => {
+      manualEntries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderTable();
+      updateStats();
+    });
   } catch(e) {
-    manualEntries = [];
+    console.warn('Firebase not configured:', e.message);
   }
 }
 
-function saveManualEntries() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(manualEntries));
+// =====================
+// THINGSPEAK
+// =====================
+async function loadData() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>&nbsp;Loading';
+
+  try {
+    const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_RESULTS}`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    tsFeeds = (data.feeds || []).filter(f => f.field1 && parseFloat(f.field1) > 0);
+    renderTable();
+    updateStats();
+    const now = new Date();
+    document.getElementById('lastUpdated').textContent =
+      'Updated ' + now.toLocaleTimeString('en-PH', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  } catch(e) {
+    document.getElementById('tableBody').innerHTML = `<tr><td colspan="7">
+      <div class="empty-state"><div class="empty-icon">⚠️</div>
+      <div class="empty-text">Failed to load data</div>
+      <div class="empty-sub">Check your internet connection</div></div>
+    </td></tr>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+  </svg> Refresh`;
 }
 
 // =====================
-// ADD MODAL
+// TABLE
 // =====================
-function openAddModal() {
-  // Default timestamp to now
-  const now = new Date();
-  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-    .toISOString().slice(0, 16);
-  document.getElementById('formTimestamp').value = local;
-  document.getElementById('formBPM').value = '';
-  document.getElementById('formQRS').value = '';
-  document.getElementById('formStatus').value = '';
-  document.getElementById('formBatch').value = '';
-  document.getElementById('formDevice').value = '1';
+function statusBadge(code) {
+  const s = STATUS_MAP[String(Math.round(parseFloat(code)))];
+  if (!s) return `<span class="status-badge unknown">Unknown</span>`;
+  return `<span class="status-badge ${s.cls}"><span class="dot"></span>${s.label}</span>`;
+}
 
-  document.getElementById('addOverlay').classList.add('open');
+function formatTimestamp(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' })
+    + ' &nbsp;'
+    + d.toLocaleTimeString('en-PH', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+
+function setFilter(val, btn) {
+  activeFilter = val;
+  document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+window.setFilter = setFilter;
+
+function renderTable() {
+  const body = document.getElementById('tableBody');
+
+  // Normalize both sources into unified shape
+  const tsNorm = tsFeeds.map(f => ({
+    created_at: f.created_at,
+    bpm: Math.round(parseFloat(f.field1)) || 0,
+    qrs: Math.round(parseFloat(f.field2)) || 0,
+    status: String(Math.round(parseFloat(f.field3))),
+    device: Math.round(parseFloat(f.field4 || '1')),
+  }));
+
+  const manNorm = manualEntries.map(e => ({
+    created_at: e.created_at,
+    bpm: Number(e.bpm),
+    qrs: Number(e.qrs),
+    status: String(e.status),
+    device: Number(e.device),
+  }));
+
+  // Merge and sort newest first
+  const combined = [...tsNorm, ...manNorm].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
+
+  const filtered = activeFilter === 'all'
+    ? combined
+    : combined.filter(r => String(r.device) === activeFilter);
+
+  document.getElementById('resultsCount').textContent =
+    `${filtered.length} record${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    body.innerHTML = `<tr><td colspan="7"><div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-text">No readings found</div>
+      <div class="empty-sub">No data for this device yet</div>
+    </div></td></tr>`;
+    return;
+  }
+
+  body.innerHTML = filtered.map((r, i) => `
+    <tr class="data-row" data-idx="${i}">
+      <td class="td-mono" style="color:var(--muted)">${filtered.length - i}</td>
+      <td class="td-mono" style="font-size:12px">${formatTimestamp(r.created_at)}</td>
+      <td><span class="device-tag">P${r.device}</span></td>
+      <td class="td-bpm">${r.bpm || '—'} <span style="font-size:11px;color:var(--muted);font-weight:400">bpm</span></td>
+      <td class="td-mono">${r.qrs || '—'} <span style="font-size:11px;color:var(--muted)">ms</span></td>
+      <td>${statusBadge(r.status)}</td>
+      <td><span class="view-hint">View strip →</span></td>
+    </tr>`).join('');
+
+  // Store filtered rows for modal lookup
+  window._displayRows = filtered;
+}
+
+// =====================
+// STATS
+// =====================
+function updateStats() {
+  const tsNorm  = tsFeeds.map(f => ({ bpm: parseFloat(f.field1), qrs: parseFloat(f.field2), status: String(Math.round(parseFloat(f.field3))), ts: f.created_at, device: Math.round(parseFloat(f.field4||'1')) }));
+  const manNorm = manualEntries.map(e => ({ bpm: Number(e.bpm), qrs: Number(e.qrs), status: String(e.status), ts: e.created_at, device: Number(e.device) }));
+  const all = [...tsNorm, ...manNorm].sort((a, b) => new Date(b.ts) - new Date(a.ts));
+
+  document.getElementById('statTotal').textContent = all.length;
+  if (all.length === 0) return;
+
+  const latest = all[0];
+  const bpm = Math.round(latest.bpm);
+  const bpmEl = document.getElementById('statBPM');
+  bpmEl.textContent = bpm ? `${bpm} bpm` : '—';
+  bpmEl.className = 'stat-value ' + (bpm < 60 ? 'blue' : bpm > 100 ? 'red' : 'green');
+
+  const qrs = Math.round(latest.qrs);
+  document.getElementById('statQRS').textContent = qrs ? `${qrs} ms` : '—';
+
+  const s = STATUS_MAP[latest.status];
+  const statusEl = document.getElementById('statStatus');
+  statusEl.textContent = s ? s.label : '—';
+  statusEl.style.color = s
+    ? (s.cls === 'normal' ? 'var(--green)' : s.cls === 'tachy' ? 'var(--red)' : 'var(--accent)')
+    : 'var(--muted)';
+
+  if (s && (s.cls === 'brady' || s.cls === 'tachy')) {
+    sendAlert(bpm, s.label, s.cls, latest.device);
+  }
+}
+
+// =====================
+// TABLE CLICK → MODAL
+// =====================
+document.getElementById('tableBody').addEventListener('click', function(e) {
+  const row = e.target.closest('tr.data-row');
+  if (!row) return;
+  const idx = parseInt(row.dataset.idx);
+  const r = window._displayRows && window._displayRows[idx];
+  if (r) openModal(r);
+});
+
+// =====================
+// ECG MODAL
+// =====================
+function openModal(r) {
+  const s = STATUS_MAP[r.status];
+  document.getElementById('modalTitle').textContent = `ECG Strip — Prototype ${r.device}`;
+  document.getElementById('modalMeta').textContent  = new Date(r.created_at).toLocaleString('en-PH');
+
+  const bpmEl = document.getElementById('modalBPM');
+  bpmEl.textContent = r.bpm ? `${r.bpm} bpm` : '—';
+  bpmEl.style.color = r.bpm < 60 ? 'var(--accent)' : r.bpm > 100 ? 'var(--red)' : 'var(--green)';
+
+  document.getElementById('modalQRS').textContent = r.qrs ? `${r.qrs} ms` : '—';
+  document.getElementById('modalStatus').innerHTML = s ? statusBadge(r.status) : '—';
+
+  document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
-  setTimeout(() => document.getElementById('formBPM').focus(), 300);
+  requestAnimationFrame(() => drawECGStrip(r.bpm, r.qrs, r.status, r.created_at));
 }
 
-function closeAddModal() {
-  document.getElementById('addOverlay').classList.remove('open');
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
+window.closeModal = closeModal;
 
-function handleAddOverlayClick(e) {
-  if (e.target === document.getElementById('addOverlay')) closeAddModal();
-}
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+});
 
-function submitManualEntry() {
-  const bpm    = parseInt(document.getElementById('formBPM').value);
-  const qrs    = parseInt(document.getElementById('formQRS').value);
-  const status = document.getElementById('formStatus').value;
-  const device = document.getElementById('formDevice').value;
-  const batch  = document.getElementById('formBatch').value.trim();
-  const tsRaw  = document.getElementById('formTimestamp').value;
-
-  if (!bpm || bpm < 20 || bpm > 250) { showToast('⚠️ Enter a valid BPM (20–250)'); return; }
-  if (!qrs || qrs < 40 || qrs > 300) { showToast('⚠️ Enter a valid QRS (40–300 ms)'); return; }
-  if (!status) { showToast('⚠️ Please select a status'); return; }
-  if (!tsRaw)  { showToast('⚠️ Please enter a date & time'); return; }
-
-  const entry = {
-    id: 'manual_' + Date.now(),
-    field1: String(bpm),
-    field2: String(qrs),
-    field3: status,
-    field4: device,
-    batch: batch || null,
-    created_at: new Date(tsRaw).toISOString(),
-    isManual: true,
+// =====================
+// ECG DRAWING
+// =====================
+function seededRand(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
   };
+}
 
-  manualEntries.push(entry);
-  saveManualEntries();
-  closeAddModal();
-  renderTable();
-  updateStats([...allFeeds, ...manualEntries]);
-  showToast('✅ Entry added successfully');
+function drawECGStrip(bpm, qrsMs, statusCode, timestamp) {
+  const canvas = document.getElementById('ecgCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#fff8f0';
+  ctx.fillRect(0, 0, W, H);
+
+  const smallGrid = 20;
+  for (let x = 0; x <= W; x += smallGrid) {
+    ctx.strokeStyle = (x % (smallGrid * 5) === 0) ? '#e8b89a' : '#f5ddd0';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y <= H; y += smallGrid) {
+    ctx.strokeStyle = (y % (smallGrid * 5) === 0) ? '#e8b89a' : '#f5ddd0';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  const seed = parseInt(String(new Date(timestamp).getTime()).slice(-6)) || 42;
+  const rand = seededRand(seed);
+  const jitter = () => (rand() - 0.5) * 0.06;
+
+  const bpmSafe = bpm > 0 ? bpm : 75;
+  const qrsSafe = qrsMs > 0 ? qrsMs : 100;
+  const rrMs    = 60000 / bpmSafe;
+  const pxPerMs = W / (rrMs * 4.2);
+
+  const isBrady = statusCode === '1';
+  const isTachy = statusCode === '3';
+  const isWideQRS = qrsSafe > 120;
+
+  const pr  = isTachy ? 120 + rand()*20 : isBrady ? 180 + rand()*20 : 150 + rand()*20;
+  const qt  = qrsSafe + (isTachy ? 160 + rand()*20 : isBrady ? 280 + rand()*30 : 220 + rand()*20);
+  const tDur = isTachy ? 120 : isBrady ? 200 : 160;
+
+  const rAmp = 0.85 + rand()*0.25;
+  const qAmp = -(0.08 + rand()*0.06);
+  const sAmp = -(0.18 + rand()*0.10);
+  const pAmp = isBrady ? 0.20 + rand()*0.05 : 0.13 + rand()*0.06;
+  const tAmp = isTachy ? 0.18 + rand()*0.06 : isBrady ? 0.35 + rand()*0.08 : 0.28 + rand()*0.06;
+  const stShift = (rand() - 0.5) * 0.04;
+  const qrsSpread = isWideQRS ? 1.6 : 1.0;
+
+  const baseline = H * 0.55;
+  const amp      = H * 0.30;
+
+  function buildCycle() {
+    const q1 = pr + 15;
+    const r1 = q1 + qrsSafe * 0.12 * qrsSpread;
+    const r2 = q1 + qrsSafe * 0.35 * qrsSpread;
+    const s1 = q1 + qrsSafe * 0.60 * qrsSpread;
+    const s2 = q1 + qrsSafe * qrsSpread;
+    const tPeak = qt, tEnd = qt + tDur * 0.6;
+    const pts = [
+      [0, jitter()], [pr*0.35, jitter()],
+      [pr*0.50, pAmp*0.4+jitter()], [pr*0.65, pAmp+jitter()],
+      [pr*0.80, pAmp*0.5+jitter()], [pr*0.95, jitter()],
+      [q1, qAmp+jitter()], [r1, rAmp*0.5+jitter()], [r2, rAmp+jitter()],
+    ];
+    if (isWideQRS) {
+      pts.push([r2+(s1-r2)*0.3, rAmp*0.55+jitter()]);
+      pts.push([r2+(s1-r2)*0.5, rAmp*0.40+jitter()]);
+      pts.push([r2+(s1-r2)*0.7, rAmp*0.30+jitter()]);
+    }
+    pts.push(
+      [s1, sAmp+jitter()], [s2, stShift+jitter()],
+      [s2+(tPeak-s2)*0.3, stShift+jitter()],
+      [s2+(tPeak-s2)*0.6, tAmp*0.3+stShift+jitter()],
+      [tPeak, tAmp+stShift+jitter()],
+      [tPeak+tDur*0.25, tAmp*0.4+jitter()],
+      [tEnd, jitter()], [rrMs, jitter()],
+    );
+    return pts;
+  }
+
+  const numBeats = Math.ceil(W / (rrMs * pxPerMs)) + 1;
+  ctx.strokeStyle = '#c0392b';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.lineCap  = 'round';
+  ctx.beginPath();
+  let first = true;
+  for (let beat = 0; beat < numBeats; beat++) {
+    const startPx = beat * rrMs * pxPerMs;
+    for (const [tMs, normAmp] of buildCycle()) {
+      const px = startPx + tMs * pxPerMs;
+      const py = baseline - normAmp * amp;
+      if (first) { ctx.moveTo(px, py); first = false; }
+      else ctx.lineTo(px, py);
+    }
+  }
+  ctx.stroke();
+
+  ctx.fillStyle = '#b0a090';
+  ctx.font = '18px DM Mono, monospace';
+  ctx.fillText('1mV', 8, baseline - amp - 6);
+  ctx.strokeStyle = '#c0b0a0';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(6, baseline); ctx.lineTo(6, baseline - amp);
+  ctx.stroke();
 }
 
 // =====================
-// DELETE
+// NOTIFICATIONS
 // =====================
-function promptDelete(id, bpm, timestamp, event) {
-  event.stopPropagation(); // don't open the row modal
-  pendingDeleteId = id;
-
-  const dt = new Date(timestamp).toLocaleString('en-PH');
-  document.getElementById('confirmDesc').textContent =
-    `${bpm} bpm — ${dt}`;
-
-  document.getElementById('confirmOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeConfirmModal() {
-  document.getElementById('confirmOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-  pendingDeleteId = null;
-}
-
-function handleConfirmOverlayClick(e) {
-  if (e.target === document.getElementById('confirmOverlay')) closeConfirmModal();
-}
-
-function confirmDelete() {
-  if (!pendingDeleteId) return;
-  manualEntries = manualEntries.filter(e => e.id !== pendingDeleteId);
-  saveManualEntries();
-  closeConfirmModal();
-  renderTable();
-  updateStats([...allFeeds, ...manualEntries]);
-  showToast('🗑 Entry deleted');
-}
-
-// =====================
-// NOTIFICATION SYSTEM
-// =====================
-let notifCooldown = false;
-let watchedProto  = null;
-
 function updateNotifButton() {
   const btn = document.getElementById('notifBtn');
   if (watchedProto && Notification.permission === 'granted') {
@@ -702,45 +687,36 @@ function openNotifModal() {
     actionBtn.style.color = 'var(--muted)';
     actionBtn.style.borderColor = 'var(--border)';
   }
-
   document.getElementById('notifOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+window.openNotifModal = openNotifModal;
 
 function closeNotifModal() {
   document.getElementById('notifOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
+window.closeNotifModal = closeNotifModal;
 
-function handleNotifOverlayClick(e) {
+document.getElementById('notifOverlay').addEventListener('click', e => {
   if (e.target === document.getElementById('notifOverlay')) closeNotifModal();
-}
+});
 
 async function confirmNotif(protoNum) {
-  if (!('Notification' in window)) {
-    showToast('⚠️ Notifications not supported in this browser');
-    closeNotifModal();
-    return;
-  }
+  if (!('Notification' in window)) { showToast('⚠️ Notifications not supported'); closeNotifModal(); return; }
   closeNotifModal();
-  const perm = Notification.permission === 'granted'
-    ? 'granted'
-    : await Notification.requestPermission();
+  const perm = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
   if (perm === 'granted') {
     watchedProto = protoNum;
     localStorage.setItem('ecg_watched_proto', protoNum);
     updateNotifButton();
     showToast(`✅ Alerts on for Prototype ${protoNum}`);
-    setTimeout(() => {
-      new Notification(`ECG Monitor · Prototype ${protoNum}`, {
-        body: `Alerts are now active.`,
-        tag: 'ecg-setup',
-      });
-    }, 500);
+    setTimeout(() => new Notification(`ECG Monitor · Prototype ${protoNum}`, { body: 'Alerts are now active.', tag: 'ecg-setup' }), 500);
   } else {
-    showToast('⚠️ Permission denied. Enable notifications in browser settings.');
+    showToast('⚠️ Permission denied');
   }
 }
+window.confirmNotif = confirmNotif;
 
 function disableNotif() {
   watchedProto = null;
@@ -751,26 +727,13 @@ function disableNotif() {
 }
 
 function sendAlert(bpm, statusLabel, statusCls, protoNum) {
-  if (notifCooldown) return;
-  if (Notification.permission !== 'granted') return;
+  if (notifCooldown || Notification.permission !== 'granted') return;
   if (!watchedProto || watchedProto !== protoNum) return;
   const emoji = statusCls === 'tachy' ? '🔴' : '🔵';
-  new Notification(`${emoji} ECG Alert — ${statusLabel}`, {
-    body: `Prototype ${protoNum} · Heart rate: ${bpm} bpm`,
-    tag: 'ecg-alert',
-  });
+  new Notification(`${emoji} ECG Alert — ${statusLabel}`, { body: `Prototype ${protoNum} · ${bpm} bpm`, tag: 'ecg-alert' });
   notifCooldown = true;
   setTimeout(() => { notifCooldown = false; }, 120000);
 }
-
-window.addEventListener('load', () => {
-  const saved = localStorage.getItem('ecg_watched_proto');
-  if (saved && Notification.permission === 'granted') {
-    watchedProto = parseInt(saved);
-    updateNotifButton();
-  }
-  loadManualEntries();
-});
 
 // =====================
 // TOAST
@@ -785,360 +748,29 @@ function showToast(msg) {
 }
 
 // =====================
-// UI HELPERS
+// ESCAPE KEY
 // =====================
-function statusBadge(code) {
-  const s = STATUS_MAP[String(Math.round(parseFloat(code)))];
-  if (!s) return `<span class="status-badge unknown">Unknown</span>`;
-  return `<span class="status-badge ${s.cls}"><span class="dot"></span>${s.label}</span>`;
-}
-
-function formatTimestamp(ts) {
-  const d = new Date(ts);
-  return d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
-    + ' &nbsp;'
-    + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-}
-
-function setFilter(val, btn) {
-  activeFilter = val;
-  document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTable();
-}
-
-// =====================
-// TABLE
-// =====================
-function renderTable() {
-  const body = document.getElementById('tableBody');
-
-  // Combine ThingSpeak feeds and manual entries, sort by date descending
-  const tsFeeds = allFeeds.map(f => ({ ...f, isManual: false }));
-  const combined = [...tsFeeds, ...manualEntries].sort(
-    (a, b) => new Date(b.created_at) - new Date(a.created_at)
-  );
-
-  const filtered = activeFilter === 'all'
-    ? combined
-    : combined.filter(f => String(Math.round(parseFloat(f.field4 || '1'))) === activeFilter);
-
-  document.getElementById('resultsCount').textContent =
-    `${filtered.length} record${filtered.length !== 1 ? 's' : ''}`;
-
-  if (filtered.length === 0) {
-    body.innerHTML = `<tr><td colspan="7">
-      <div class="empty-state">
-        <div class="empty-icon">🔍</div>
-        <div class="empty-text">No readings found</div>
-        <div class="empty-sub">No data for this device yet</div>
-      </div>
-    </td></tr>`;
-    return;
-  }
-
-  body.innerHTML = filtered.map((f, i) => {
-    const bpm    = Math.round(parseFloat(f.field1)) || 0;
-    const qrs    = Math.round(parseFloat(f.field2)) || 0;
-    const dev    = Math.round(parseFloat(f.field4 || '1'));
-    const isMan  = f.isManual;
-    const rowNum = filtered.length - i;
-
-    const batchTag = (isMan && f.batch)
-      ? `<span style="font-size:11px;color:#92400e;margin-left:6px">${f.batch}</span>`
-      : '';
-    const manualTag = isMan
-      ? `<span class="manual-tag">MANUAL</span>`
-      : '';
-
-    const actionCell = isMan
-      ? `<button class="delete-btn" onclick="promptDelete('${f.id}', ${bpm}, '${f.created_at}', event)" title="Delete this entry">🗑</button>`
-      : `<span class="view-hint">View strip →</span>`;
-
-    // For ThingSpeak entries, store index for modal; for manual, store id
-    const clickAttr = isMan
-      ? `onclick="openManualModal('${f.id}')"`
-      : `onclick="openModal('${f.id || i}')"`;
-
-    return `
-    <tr class="data-row ${isMan ? 'manual-row' : ''}" ${isMan ? `onclick="openManualModal('${f.id}')"` : `onclick="openTSModal(${allFeeds.findIndex(x => x === f || (!isMan && x.created_at === f.created_at && x.field1 === f.field1))})"`}>
-      <td class="td-mono" style="color:var(--muted)">${rowNum}</td>
-      <td class="td-mono" style="font-size:12px">${formatTimestamp(f.created_at)}${batchTag}</td>
-      <td><span class="device-tag">P${dev}</span>${manualTag}</td>
-      <td class="td-bpm">${bpm || '—'} <span style="font-size:11px;color:var(--muted);font-weight:400">bpm</span></td>
-      <td class="td-mono">${qrs || '—'} <span style="font-size:11px;color:var(--muted)">ms</span></td>
-      <td>${statusBadge(f.field3)}</td>
-      <td onclick="event.stopPropagation()">${actionCell}</td>
-    </tr>`;
-  }).join('');
-}
-
-// =====================
-// STATS
-// =====================
-function updateStats(feeds) {
-  document.getElementById('statTotal').textContent = feeds.length;
-  if (feeds.length === 0) return;
-  const sorted = [...feeds].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  const latest = sorted[0];
-  const bpm = Math.round(parseFloat(latest.field1)) || 0;
-  const bpmEl = document.getElementById('statBPM');
-  bpmEl.textContent = bpm ? `${bpm} bpm` : '—';
-  bpmEl.className = 'stat-value ' + (bpm < 60 ? 'blue' : bpm > 100 ? 'red' : 'green');
-
-  const qrs = Math.round(parseFloat(latest.field2)) || 0;
-  document.getElementById('statQRS').textContent = qrs ? `${qrs} ms` : '—';
-
-  const statusEl = document.getElementById('statStatus');
-  const code = String(Math.round(parseFloat(latest.field3)));
-  const s = STATUS_MAP[code];
-  statusEl.textContent = s ? s.label : '—';
-  statusEl.style.color = s
-    ? (s.cls === 'normal' ? 'var(--green)' : s.cls === 'tachy' ? 'var(--red)' : 'var(--accent)')
-    : 'var(--muted)';
-
-  const dev = Math.round(parseFloat(latest.field4 || '1'));
-  if (s && (s.cls === 'brady' || s.cls === 'tachy') && !latest.isManual) {
-    sendAlert(bpm, s.label, s.cls, dev);
-  }
-}
-
-// =====================
-// ECG DRAWING
-// =====================
-function seededRand(seed) {
-  let s = seed;
-  return function() {
-    s = (s * 1664525 + 1013904223) & 0xffffffff;
-    return (s >>> 0) / 0xffffffff;
-  };
-}
-
-function drawECGStrip(bpm, qrsMs, statusCode, timestamp) {
-  const canvas = document.getElementById('ecgCanvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width;
-  const H = canvas.height;
-
-  ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = '#fff8f0';
-  ctx.fillRect(0, 0, W, H);
-
-  const smallGrid = 20;
-  ctx.lineWidth = 0.5;
-  for (let x = 0; x <= W; x += smallGrid) {
-    ctx.strokeStyle = (x % (smallGrid * 5) === 0) ? '#e8b89a' : '#f5ddd0';
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-  }
-  for (let y = 0; y <= H; y += smallGrid) {
-    ctx.strokeStyle = (y % (smallGrid * 5) === 0) ? '#e8b89a' : '#f5ddd0';
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-  }
-
-  const seed = parseInt(String(new Date(timestamp).getTime()).slice(-6)) || 42;
-  const rand = seededRand(seed);
-  const jitter = () => (rand() - 0.5) * 0.06;
-
-  const bpmSafe  = bpm  > 0 ? bpm  : 75;
-  const qrsSafe  = qrsMs > 0 ? qrsMs : 100;
-  const rrMs     = 60000 / bpmSafe;
-  const pxPerMs  = W / (rrMs * 4.2);
-
-  const isBrady = statusCode === '1';
-  const isTachy = statusCode === '3';
-  const isWideQRS = qrsSafe > 120;
-
-  const pr  = isTachy ? 120 + rand()*20 : isBrady ? 180 + rand()*20 : 150 + rand()*20;
-  const qt  = qrsSafe + (isTachy ? 160 + rand()*20 : isBrady ? 280 + rand()*30 : 220 + rand()*20);
-  const tDur = isTachy ? 120 : isBrady ? 200 : 160;
-
-  const rAmp  = 0.85 + rand()*0.25;
-  const qAmp  = -(0.08 + rand()*0.06);
-  const sAmp  = -(0.18 + rand()*0.10);
-  const pAmp  = isBrady ? 0.20 + rand()*0.05 : 0.13 + rand()*0.06;
-  const tAmp  = isTachy ? 0.18 + rand()*0.06 : isBrady ? 0.35 + rand()*0.08 : 0.28 + rand()*0.06;
-  const stShift = (rand() - 0.5) * 0.04;
-  const qrsSpread = isWideQRS ? 1.6 : 1.0;
-
-  const baseline = H * 0.55;
-  const amp      = H * 0.30;
-
-  function buildCycle() {
-    const q1 = pr + 15;
-    const r1 = q1 + qrsSafe * 0.12 * qrsSpread;
-    const r2 = q1 + qrsSafe * 0.35 * qrsSpread;
-    const s1 = q1 + qrsSafe * 0.60 * qrsSpread;
-    const s2 = q1 + qrsSafe * qrsSpread;
-    const tPeak = qt;
-    const tEnd  = qt + tDur * 0.6;
-
-    const pts = [
-      [0,          jitter()],
-      [pr*0.35,    jitter()],
-      [pr*0.50,    pAmp*0.4 + jitter()],
-      [pr*0.65,    pAmp     + jitter()],
-      [pr*0.80,    pAmp*0.5 + jitter()],
-      [pr*0.95,    jitter()],
-      [q1,         qAmp     + jitter()],
-      [r1,         rAmp*0.5 + jitter()],
-      [r2,         rAmp     + jitter()],
-    ];
-
-    if (isWideQRS) {
-      pts.push([r2 + (s1-r2)*0.3, rAmp*0.55 + jitter()]);
-      pts.push([r2 + (s1-r2)*0.5, rAmp*0.40 + jitter()]);
-      pts.push([r2 + (s1-r2)*0.7, rAmp*0.30 + jitter()]);
-    }
-
-    pts.push(
-      [s1,         sAmp     + jitter()],
-      [s2,         stShift  + jitter()],
-      [s2 + (tPeak-s2)*0.3, stShift + jitter()],
-      [s2 + (tPeak-s2)*0.6, tAmp*0.3 + stShift + jitter()],
-      [tPeak,      tAmp     + stShift + jitter()],
-      [tPeak + tDur*0.25, tAmp*0.4 + jitter()],
-      [tEnd,       jitter()],
-      [rrMs,       jitter()],
-    );
-    return pts;
-  }
-
-  const numBeats = Math.ceil(W / (rrMs * pxPerMs)) + 1;
-  ctx.strokeStyle = '#c0392b';
-  ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
-  ctx.lineCap  = 'round';
-  ctx.beginPath();
-
-  let first = true;
-  for (let beat = 0; beat < numBeats; beat++) {
-    const startPx = beat * rrMs * pxPerMs;
-    const cycle = buildCycle();
-    for (const [tMs, normAmp] of cycle) {
-      const px = startPx + tMs * pxPerMs;
-      const py = baseline - normAmp * amp;
-      if (first) { ctx.moveTo(px, py); first = false; }
-      else ctx.lineTo(px, py);
-    }
-  }
-  ctx.stroke();
-
-  ctx.fillStyle = '#b0a090';
-  ctx.font = '18px DM Mono, monospace';
-  ctx.fillText('1mV', 8, baseline - amp - 6);
-  ctx.strokeStyle = '#c0b0a0';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(6, baseline); ctx.lineTo(6, baseline - amp);
-  ctx.stroke();
-}
-
-// =====================
-// ECG MODAL (shared)
-// =====================
-function openModalWith(bpm, qrs, code, dev, timestamp, isManual, batch) {
-  const s = STATUS_MAP[String(code)];
-  const titleSuffix = isManual ? ' — Manual Entry' : '';
-  const batchLine = (isManual && batch) ? ` · ${batch}` : '';
-
-  document.getElementById('modalTitle').textContent = `ECG Strip — Prototype ${dev}${titleSuffix}`;
-  document.getElementById('modalMeta').textContent  = new Date(timestamp).toLocaleString('en-PH') + batchLine;
-
-  const bpmEl = document.getElementById('modalBPM');
-  bpmEl.textContent = bpm ? `${bpm} bpm` : '—';
-  bpmEl.style.color = bpm < 60 ? 'var(--accent)' : bpm > 100 ? 'var(--red)' : 'var(--green)';
-
-  document.getElementById('modalQRS').textContent = qrs ? `${qrs} ms` : '—';
-  const stEl = document.getElementById('modalStatus');
-  stEl.innerHTML = s ? statusBadge(String(code)) : '—';
-
-  document.getElementById('modalOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-
-  requestAnimationFrame(() => drawECGStrip(bpm, qrs, String(code), timestamp));
-}
-
-function openTSModal(feedIndex) {
-  const f = allFeeds[feedIndex];
-  if (!f) return;
-  const bpm  = Math.round(parseFloat(f.field1)) || 0;
-  const qrs  = Math.round(parseFloat(f.field2)) || 0;
-  const code = Math.round(parseFloat(f.field3));
-  const dev  = Math.round(parseFloat(f.field4 || '1'));
-  openModalWith(bpm, qrs, code, dev, f.created_at, false, null);
-}
-
-function openManualModal(id) {
-  const f = manualEntries.find(e => e.id === id);
-  if (!f) return;
-  const bpm  = Math.round(parseFloat(f.field1)) || 0;
-  const qrs  = Math.round(parseFloat(f.field2)) || 0;
-  const code = Math.round(parseFloat(f.field3));
-  const dev  = Math.round(parseFloat(f.field4 || '1'));
-  openModalWith(bpm, qrs, code, dev, f.created_at, true, f.batch);
-}
-
-// Legacy compat - keep openModal working for ThingSpeak rows
-function openModal(feedIndex) { openTSModal(feedIndex); }
-
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
-}
-
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeNotifModal(); closeAddModal(); closeConfirmModal(); }
+  if (e.key === 'Escape') { closeModal(); closeNotifModal(); }
 });
 
 // =====================
-// DATA LOAD
+// INIT
 // =====================
-async function loadData() {
-  const btn = document.getElementById('refreshBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>&nbsp;Loading';
-
-  try {
-    const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_RESULTS}`;
-    const res  = await fetch(url);
-    const data = await res.json();
-    allFeeds = (data.feeds || []).filter(f => f.field1 && parseFloat(f.field1) > 0);
-    updateStats([...allFeeds, ...manualEntries]);
-    renderTable();
-    const now = new Date();
-    document.getElementById('lastUpdated').textContent =
-      'Updated ' + now.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  } catch(e) {
-    document.getElementById('tableBody').innerHTML = `<tr><td colspan="7">
-      <div class="empty-state">
-        <div class="empty-icon">⚠️</div>
-        <div class="empty-text">Failed to load data</div>
-        <div class="empty-sub">Check your internet connection or API key</div>
-      </div>
-    </td></tr>`;
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-    <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-  </svg> Refresh`;
+const saved = localStorage.getItem('ecg_watched_proto');
+if (saved && Notification.permission === 'granted') {
+  watchedProto = parseInt(saved);
+  updateNotifButton();
 }
 
-// Init
-loadManualEntries();
+initFirebase();
 loadData();
 
 let countdown = 15;
 setInterval(() => {
   countdown--;
-  if (countdown <= 0) {
-    countdown = 15;
-    loadData();
-  } else {
+  if (countdown <= 0) { countdown = 15; loadData(); }
+  else {
     const el = document.getElementById('lastUpdated');
     const base = el.textContent.split(' ·')[0];
     el.textContent = base + ' · refresh in ' + countdown + 's';
