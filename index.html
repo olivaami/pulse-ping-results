@@ -163,7 +163,7 @@
 </header>
 
 <main>
-  <div class="page-title">Pulse Ping Results</div>
+  <div class="page-title">Pulse Ping</div>
   <p class="page-sub">All readings from your ECG prototypes. Click any row to view the ECG strip.</p>
 
   <div class="stats-row">
@@ -319,6 +319,7 @@ let activeFilter = 'all';
 let openRow      = null;
 let notifCooldown = false;
 let watchedProto = null;
+let lastAlertedTS = null;  // tracks which reading we last alerted on
 
 // =====================
 // FIREBASE
@@ -493,7 +494,7 @@ function updateStats() {
     : 'var(--muted)';
 
   if (s && (s.cls === 'brady' || s.cls === 'tachy')) {
-    sendAlert(bpm, s.label, s.cls, latest.device);
+    sendAlert(bpm, s.label, s.cls, latest.device, latest.ts);
   }
 }
 
@@ -742,13 +743,14 @@ function disableNotif() {
   showToast('🔕 Alerts turned off');
 }
 
-function sendAlert(bpm, statusLabel, statusCls, protoNum) {
-  if (notifCooldown || Notification.permission !== 'granted') return;
+function sendAlert(bpm, statusLabel, statusCls, protoNum, readingTS) {
+  if (Notification.permission !== 'granted') return;
   if (!watchedProto || watchedProto !== protoNum) return;
+  // Only alert if this is a reading we haven't alerted on before
+  if (lastAlertedTS === readingTS) return;
+  lastAlertedTS = readingTS;
   const emoji = statusCls === 'tachy' ? '🔴' : '🔵';
   new Notification(`${emoji} ECG Alert — ${statusLabel}`, { body: `Prototype ${protoNum} · ${bpm} bpm`, tag: 'ecg-alert' });
-  notifCooldown = true;
-  setTimeout(() => { notifCooldown = false; }, 120000);
 }
 
 // =====================
@@ -778,6 +780,11 @@ if (saved && Notification.permission === 'granted') {
   watchedProto = parseInt(saved);
   updateNotifButton();
 }
+
+// Seed lastAlertedTS so we don't alert on stale data when the page first loads.
+// After the first loadData() resolves, any reading that already existed won't fire.
+// Only genuinely NEW readings (newer than page-open time) will trigger alerts.
+lastAlertedTS = new Date().toISOString();
 
 initFirebase();
 loadData();
