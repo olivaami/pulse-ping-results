@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pulse Ping</title>
+<title>Pulse Ping — Results</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -287,22 +287,19 @@
 // ============================================================
 // 🔧 PASTE THE SAME FIREBASE CONFIG AS IN ecg-admin.html
 // ============================================================
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDhawfWUerW8-wiMZKMlU8rs3mSisJiS5E",
-  authDomain: "ecg-result.firebaseapp.com",
-  projectId: "ecg-result",
-  storageBucket: "ecg-result.firebasestorage.app",
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyDhawfWUerW8-wiMZKMlU8rs3mSisJiS5E",
+  authDomain:        "ecg-result.firebaseapp.com",
+  projectId:         "ecg-result",
+  storageBucket:     "ecg-result.firebasestorage.app",
   messagingSenderId: "293139984564",
-  appId: "1:293139984564:web:fed1018858fb9b2938e7e1",
-  measurementId: "G-EBPVJ45693"
+  appId:             "1:293139984564:web:fed1018858fb9b2938e7e1",
+  measurementId:     "G-EBPVJ45693"
 };
-
-   // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 // ============================================================
 
 const CHANNEL_ID  = '3290555';
@@ -328,7 +325,7 @@ let watchedProto = null;
 // =====================
 function initFirebase() {
   try {
-    if (FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY') return;
+    if (!FIREBASE_CONFIG.apiKey) return;
     const app = initializeApp(FIREBASE_CONFIG);
     const db  = getFirestore(app);
     onSnapshot(collection(db, COLLECTION), (snap) => {
