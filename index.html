@@ -163,7 +163,7 @@
 </header>
 
 <main>
-  <div class="page-title">Pulse Ping</div>
+  <div class="page-title">Pulse Ping Results</div>
   <p class="page-sub">All readings from your ECG prototypes. Click any row to view the ECG strip.</p>
 
   <div class="stats-row">
@@ -397,22 +397,31 @@ window.setFilter = setFilter;
 function renderTable() {
   const body = document.getElementById('tableBody');
 
-  // Normalize both sources into unified shape
-  const tsNorm = tsFeeds.map(f => ({
-    created_at: f.created_at,
-    bpm: Math.round(parseFloat(f.field1)) || 0,
-    qrs: Math.round(parseFloat(f.field2)) || 0,
-    status: String(Math.round(parseFloat(f.field3))),
-    device: Math.round(parseFloat(f.field4 || '1')),
-  }));
+  // Build suppression sets from Firebase entries
+  const overriddenKeys = new Set(manualEntries.filter(e => e.ts_override_key).map(e => e.ts_override_key));
+  const hiddenKeys     = new Set(manualEntries.filter(e => e.ts_hidden_key).map(e => e.ts_hidden_key));
 
-  const manNorm = manualEntries.map(e => ({
-    created_at: e.created_at,
-    bpm: Number(e.bpm),
-    qrs: Number(e.qrs),
-    status: String(e.status),
-    device: Number(e.device),
-  }));
+  // TS rows — skip suppressed ones
+  const tsNorm = tsFeeds
+    .filter(f => !overriddenKeys.has(f.created_at) && !hiddenKeys.has(f.created_at))
+    .map(f => ({
+      created_at: f.created_at,
+      bpm: Math.round(parseFloat(f.field1)) || 0,
+      qrs: Math.round(parseFloat(f.field2)) || 0,
+      status: String(Math.round(parseFloat(f.field3))),
+      device: Math.round(parseFloat(f.field4 || '1')),
+    }));
+
+  // Firebase entries — skip hidden-marker docs (they have no display data)
+  const manNorm = manualEntries
+    .filter(e => !e.ts_hidden_key)
+    .map(e => ({
+      created_at: e.created_at,
+      bpm: Number(e.bpm),
+      qrs: Number(e.qrs),
+      status: String(e.status),
+      device: Number(e.device),
+    }));
 
   // Merge and sort newest first
   const combined = [...tsNorm, ...manNorm].sort(
@@ -446,7 +455,6 @@ function renderTable() {
       <td><span class="view-hint">View strip →</span></td>
     </tr>`).join('');
 
-  // Store filtered rows for modal lookup
   window._displayRows = filtered;
 }
 
@@ -454,8 +462,15 @@ function renderTable() {
 // STATS
 // =====================
 function updateStats() {
-  const tsNorm  = tsFeeds.map(f => ({ bpm: parseFloat(f.field1), qrs: parseFloat(f.field2), status: String(Math.round(parseFloat(f.field3))), ts: f.created_at, device: Math.round(parseFloat(f.field4||'1')) }));
-  const manNorm = manualEntries.map(e => ({ bpm: Number(e.bpm), qrs: Number(e.qrs), status: String(e.status), ts: e.created_at, device: Number(e.device) }));
+  const overriddenKeys = new Set(manualEntries.filter(e => e.ts_override_key).map(e => e.ts_override_key));
+  const hiddenKeys     = new Set(manualEntries.filter(e => e.ts_hidden_key).map(e => e.ts_hidden_key));
+
+  const tsNorm  = tsFeeds
+    .filter(f => !overriddenKeys.has(f.created_at) && !hiddenKeys.has(f.created_at))
+    .map(f => ({ bpm: parseFloat(f.field1), qrs: parseFloat(f.field2), status: String(Math.round(parseFloat(f.field3))), ts: f.created_at, device: Math.round(parseFloat(f.field4||'1')) }));
+  const manNorm = manualEntries
+    .filter(e => !e.ts_hidden_key)
+    .map(e => ({ bpm: Number(e.bpm), qrs: Number(e.qrs), status: String(e.status), ts: e.created_at, device: Number(e.device) }));
   const all = [...tsNorm, ...manNorm].sort((a, b) => new Date(b.ts) - new Date(a.ts));
 
   document.getElementById('statTotal').textContent = all.length;
