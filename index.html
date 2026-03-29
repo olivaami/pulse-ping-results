@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pulse Ping — Results</title>
+<title>ECG Monitor — Results</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -146,7 +146,7 @@
                 stroke="#22c55e" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <div>
-      <div class="logo-text">Pulse Ping</div>
+      <div class="logo-text">ECG Monitor</div>
       <div class="logo-sub">ThingSpeak · CH 3290555</div>
     </div>
   </div>
@@ -163,7 +163,7 @@
 </header>
 
 <main>
-  <div class="page-title">Pulse Ping</div>
+  <div class="page-title">ECG Results</div>
   <p class="page-sub">All readings from your ECG prototypes. Click any row to view the ECG strip.</p>
 
   <div class="stats-row">
@@ -319,7 +319,8 @@ let activeFilter = 'all';
 let openRow      = null;
 let notifCooldown = false;
 let watchedProto = null;
-let lastAlertedTS = null;  // tracks which reading we last alerted on
+let lastAlertedTS = null;
+let lastSeenTS = null;  // tracks which reading we last alerted on
 
 // =====================
 // FIREBASE
@@ -348,6 +349,7 @@ async function loadData() {
   btn.innerHTML = '<span class="spinner"></span>&nbsp;Loading';
 
   try {
+    // Fetch all for table display
     const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_RESULTS}`;
     const res  = await fetch(url);
     const data = await res.json();
@@ -369,6 +371,32 @@ async function loadData() {
   btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
     <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
   </svg> Refresh`;
+}
+
+// Lightweight poller — fetches only the latest single entry every 5s for alert checking
+async function pollLatest() {
+  try {
+    const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds/last.json?api_key=${READ_KEY}`;
+    const res  = await fetch(url);
+    const f    = await res.json();
+    if (!f || !f.field1 || parseFloat(f.field1) <= 0) return;
+
+    const bpm    = Math.round(parseFloat(f.field1));
+    const status = String(Math.round(parseFloat(f.field3)));
+    const device = Math.round(parseFloat(f.field4 || '1'));
+    const s      = STATUS_MAP[status];
+
+    if (s && (s.cls === 'brady' || s.cls === 'tachy')) {
+      sendAlert(bpm, s.label, s.cls, device, f.created_at);
+    }
+
+    // If new data appeared, also refresh the full table every 30s
+    if (f.created_at !== lastSeenTS) {
+      lastSeenTS = f.created_at;
+      // Trigger a full reload so the table reflects the new entry
+      loadData();
+    }
+  } catch(e) { /* silent fail on poll errors */ }
 }
 
 // =====================
@@ -789,10 +817,14 @@ lastAlertedTS = new Date().toISOString();
 initFirebase();
 loadData();
 
-let countdown = 15;
+// Poll latest entry every 5s for near-real-time alerts
+setInterval(pollLatest, 5000);
+
+// Refresh full table every 30s and update the countdown display
+let countdown = 30;
 setInterval(() => {
   countdown--;
-  if (countdown <= 0) { countdown = 15; loadData(); }
+  if (countdown <= 0) { countdown = 30; loadData(); }
   else {
     const el = document.getElementById('lastUpdated');
     const base = el.textContent.split(' ·')[0];
